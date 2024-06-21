@@ -48,7 +48,7 @@ function Formulario() {
         </h1>
         <ul className=" text-white bg-slate-500 rounded-md p-2">
           {list.map((n) => (
-            <li className="border-b border-slate-400">{n}</li>
+            <li key={n} className="border-b border-slate-400">{n}</li>
           ))}
         </ul>
       </div>
@@ -66,6 +66,7 @@ function Formulario() {
           Comprar
         </button>
         <button
+          type="button"
           onClick={addProduct}
           className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md"
         >
