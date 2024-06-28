@@ -1,12 +1,13 @@
 import Formulario from "./Formulario"
+import ListProducts from "./ListProducts";
 
 function Panel(){
     return (
-        <div className="p-8 flex flex-col bg-slate-800 rounded-md ">
-            <h1 className="text-white font-semibold text-3xl text-center my-3">Facturacion - Ferreteria</h1>
+        <div className="p-8 flex w-full h-full justify-around items-center">
             <Formulario/>
+            <ListProducts/>
         </div>
     )
 }
 
-export default Panel
+export default Panel;
