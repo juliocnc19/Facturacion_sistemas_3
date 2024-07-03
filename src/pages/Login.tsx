@@ -1,4 +1,7 @@
 import { useForm } from "react-hook-form";
+import useSupaBase from "../db/useSupaBase";
+import { useNavigate } from 'react-router-dom';
+
 type Inputs = {
   email: string;
   password: string;
@@ -10,9 +13,18 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
+  
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const supabase = useSupaBase()
+  const navigation = useNavigate()
+
+  const onSubmit = async (input: Inputs) => {
+    let {data,error} = await supabase!.from('users').select('id').eq("email",input.email).eq("password",input.password)
+    if(error) return
+    if(data && data.length >= 1){
+      navigation("/dashboard")
+    }
+    
   };
 
   return (
