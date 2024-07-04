@@ -11,11 +11,11 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Autocomplete, 
-  AutocompleteItem
 } from "@nextui-org/react";
 import { productStore } from "../store/productsStore";
 import { fecthMethod } from "../db/data";
+import useSupaBase from "../db/useSupaBase";
+import { useState } from "react";
 
 export default function ModalCompra() {
   const isOpen = productStore((state) => state.isOpen);
@@ -24,6 +24,8 @@ export default function ModalCompra() {
   const wipe = productStore((state) => state.wipeProduct);
   const total = productStore(state=>state.total)
   const changeTotal = productStore(state=> state.changeTotal)
+  const [method,setMethod] = useState("")
+  const supabase = useSupaBase()
 
   const cancelBuy = () => {
     changeIsOpen();
@@ -31,9 +33,28 @@ export default function ModalCompra() {
     changeTotal(-total);
   };
 
+  const handleSubmit = async(e:any) => {
+    e.preventDefault()
+    console.log(method)
+    console.log(total)
+    const productSend = JSON.stringify(listProducts)
+    
+    const { data, error } = await supabase!
+    .from('record_sell')
+    .insert([
+      { mount: total, method_id: method ,products:productSend },
+    ])
+    .select()
+    if(!error){
+      changeIsOpen()
+    }
+        
+  }
+
   return (
     <>
       <Modal isOpen={isOpen}>
+        <form onSubmit={handleSubmit}>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">Factura</ModalHeader>
           <ModalBody>
@@ -54,14 +75,17 @@ export default function ModalCompra() {
               ))}
               </TableBody>
               </Table>
-              <span className="font-medium m-2 text-xl">Total a pagar: ${total}</span>
-              <div className="bg-slate-100 flex flex-col m-2 p-2 rounded-sm">
+              <p className="font-medium m-2 text-xl">Total neto: ${total}</p>
+              <p className="font-medium m-2 text-xl">Tota mas IVA : ${(total * 0.16)+total}</p>
+              <div className="bg-slate-100 flex flex-col m-2 p-2 rounded-md">
                 
-                <Autocomplete label="Metodo de pago">
+                <select 
+                className="outline-none p-2 rounded-md" 
+                onChange={(e)=>setMethod((e.target.value))}>
                   {fecthMethod.map((m) => (
-                    <AutocompleteItem value={m.id} key={m.id}>{m.method}</AutocompleteItem>
+                    <option value={m.id} key={m.id}>{m.method}</option>
                   ))}
-                </Autocomplete>
+                </select>
               </div>
             </div>
           </ModalBody>
@@ -69,11 +93,12 @@ export default function ModalCompra() {
             <Button color="danger" variant="light" onPress={cancelBuy}>
               Cancelar compra
             </Button>
-            <Button color="success" variant="light" onPress={cancelBuy}>
+            <Button type="submit" color="success" variant="light">
               Realizar compra
             </Button>
           </ModalFooter>
         </ModalContent>
+        </form>
       </Modal>
     </>
   );

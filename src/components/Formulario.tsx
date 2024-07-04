@@ -44,7 +44,7 @@ function Formulario() {
       >
         <option value=""></option>
         {fetchProducts.map((n)=>(
-          <option value={n.id} key={n.id}>{n.name} ----- Precio: ${n.mount}</option>
+          <option value={n.id} key={n.id}>{n.name} ${n.mount}</option>
         ))}
       </select>
 

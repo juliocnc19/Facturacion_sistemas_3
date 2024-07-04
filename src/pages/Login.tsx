@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import useSupaBase from "../db/useSupaBase";
 import { useNavigate } from 'react-router-dom';
+import {CircularProgress} from "@nextui-org/progress";
+import { useState } from "react";
 
 type Inputs = {
   email: string;
@@ -13,17 +15,24 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
+  const [isLoading,setIsloading] = useState(false)
+  const [authError,setAuthError] = useState<string | boolean>(false)
   
 
   const supabase = useSupaBase()
   const navigation = useNavigate()
 
   const onSubmit = async (input: Inputs) => {
+    setIsloading(true)
     let {data,error} = await supabase!.from('users').select('id').eq("email",input.email).eq("password",input.password)
     if(error) return
     if(data && data.length >= 1){
       navigation("/dashboard")
+    }else{
+      setIsloading(false)
+      setAuthError("Crendenciales invalidas")
     }
+    setIsloading(false)
     
   };
 
@@ -75,11 +84,11 @@ export default function Login() {
           )}
         </div>
 
-        <input
-          className="p-2 text-white bg-green-600 rounded-md hover:bg-green-700"
+        <button
+          className="p-2 text-white bg-green-600 rounded-md hover:bg-green-700 flex justify-center"
           type="submit"
-          value="Ingresar"
-        />
+        >{isLoading ? <CircularProgress size="sm"/> : "Ingresar"}</button>
+        {authError && <p className="text-center text-red-700 my-2">{authError}</p>}
       </form>
     </div>
   );
